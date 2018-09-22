@@ -16,7 +16,7 @@ def check_entry(entry,pangram,special,scr,report=True):
         if report: scr.addstr("Not a word.")
         return 0
     elif special not in entry:
-        if report: scr.addstr("Missing" + special.upper())
+        if report: scr.addstr("Missing " + special.upper())
         return 0
     s = set(list(entry))
     all = set(list(pangram))
@@ -36,20 +36,22 @@ def check_entry(entry,pangram,special,scr,report=True):
 def printfound(found,scr):
     fwds = list(found)
     fwds.sort()
-    n = ceil(len(fwds) /3)
-    if n > curses.LINES - 4:
+    m = (curses.COLS - 22) // 15
+    # m=3
+    n = ceil(len(fwds) / m)
+    if n > curses.LINES - 2:
         print("Too many words.")
-        quit()
     else:
-        for i,w in enumerate(fwds[:n]):
-            scr.addstr(4+i,22,w)
-            scr.clrtoeol()
-        for i,w in enumerate(fwds[n:2*n]):
-            scr.addstr(4+i,37,w)
-            scr.clrtoeol()
-        for i,w in enumerate(fwds[2*n:]):
-            scr.addstr(4+i,52,w)
-            scr.clrtoeol()
+        for j in range(m):
+            for i,w in enumerate(fwds[n*j:n*j + n]):
+                scr.addstr(2+i,22+15*j,w)
+                scr.clrtoeol()
+            # for i,w in enumerate(fwds[n:2*n]):
+            #     scr.addstr(4+i,37,w)
+            #     scr.clrtoeol()
+            # for i,w in enumerate(fwds[2*n:]):
+            #     scr.addstr(4+i,52,w)
+            #     scr.clrtoeol()
         
 def main(stdscr):
     stdscr.clear()
@@ -70,10 +72,10 @@ def main(stdscr):
     tot = sum(solve.values())
 
     # print(tot,"\n",pgram,"\n",list(solve.keys())[:10])
-    stdscr.addstr(4,9," " + others[0].upper() + " " + others[1].upper())
-    stdscr.addstr(5,9,others[2].upper() + " " + special.upper() + " " + others[3].upper())
-    stdscr.addstr(6,9," " + others[4].upper() + " " + others[5].upper())
-
+    stdscr.addstr(4,3,"    " + others[0].upper() + "     " + others[1].upper())
+    stdscr.addstr(6,3," " + others[2].upper() + "          " + " " + others[3].upper())
+    stdscr.addstr(8,3,"    " + others[4].upper() + "     " + others[5].upper())
+    stdscr.addstr(6,10,special.upper(),curses.A_BOLD)
 
     while score < tot/5:
         stdscr.addstr(0,9,"{} of {}".format(score, tot))
@@ -92,7 +94,7 @@ def main(stdscr):
             else:
                 # print("---",c,curses.KEY_DL)
                 entry += chr(c)
-            stdscr.addstr(2,max(12 - len(entry)//2,0),entry.upper())
+            stdscr.addstr(2,max(10 - len(entry)//2,0),entry.upper())
             stdscr.move(12,0)
 
         entry = entry.strip()
