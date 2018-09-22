@@ -2,6 +2,7 @@
 
 import random,time
 import curses
+from math import ceil
 
 with open("scrabble.txt") as f:
     wds = [x.strip().lower() for x in f.readlines()[2:] if len(x) > 4]
@@ -32,8 +33,24 @@ def check_entry(entry,pangram,special,scr,report=True):
         if report: scr.addstr("Not Valid.")
         return(0)
 
-
-
+def printfound(found,scr):
+    fwds = list(found)
+    fwds.sort()
+    n = ceil(len(fwds) /3)
+    if n > curses.LINES - 4:
+        print("Too many words.")
+        quit()
+    else:
+        for i,w in enumerate(fwds[:n]):
+            scr.addstr(4+i,22,w)
+            scr.clrtoeol()
+        for i,w in enumerate(fwds[n:2*n]):
+            scr.addstr(4+i,37,w)
+            scr.clrtoeol()
+        for i,w in enumerate(fwds[2*n:]):
+            scr.addstr(4+i,52,w)
+            scr.clrtoeol()
+        
 def main(stdscr):
     stdscr.clear()
     curses.curs_set(0)
@@ -57,11 +74,12 @@ def main(stdscr):
     stdscr.addstr(5,9,others[2].upper() + " " + special.upper() + " " + others[3].upper())
     stdscr.addstr(6,9," " + others[4].upper() + " " + others[5].upper())
 
-    for n in range(2,curses.LINES):
-        stdscr.addstr(n,20,"|")
 
     while score < tot/5:
         stdscr.addstr(0,9,"{} of {}".format(score, tot))
+        for n in range(2,curses.LINES):
+            stdscr.addstr(n,20,"|")
+        printfound(found,stdscr)
         c = " "
         entry = ""
         stdscr.addstr(2,max(12 - len(entry)//2,0),entry.upper())
