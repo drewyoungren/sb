@@ -77,16 +77,15 @@ def main(stdscr):
     stdscr.addstr(8,3,"    " + others[4].upper() + "     " + others[5].upper())
     stdscr.addstr(6,10,special.upper(),curses.A_BOLD)
 
-    while score < tot/5:
+    while score < tot:
         stdscr.addstr(0,9,"{} of {}".format(score, tot))
         for n in range(2,curses.LINES):
             stdscr.addstr(n,20,"|")
         printfound(found,stdscr)
-        c = " "
         entry = ""
         stdscr.addstr(2,max(12 - len(entry)//2,0),entry.upper())
+        c = stdscr.getch()
         while c != ord("\n"):
-            c = stdscr.getch()
             if c == 127:
                 entry = entry[:-1]
                 stdscr.move(2,0)
@@ -96,6 +95,7 @@ def main(stdscr):
                 entry += chr(c)
             stdscr.addstr(2,max(10 - len(entry)//2,0),entry.upper())
             stdscr.move(12,0)
+            c = stdscr.getch()
 
         entry = entry.strip()
 
@@ -124,5 +124,10 @@ def main(stdscr):
         time.sleep(.1)
         stdscr.move(2,0)
         stdscr.clrtoeol()
+
+    stdscr.move(12,0)
+    stdscr.clrtoeol()
+    stdscr.addstr("Queen Bee!")
+    stdscr.getch()
 
 curses.wrapper(main)
